@@ -1,0 +1,34 @@
+{
+  "name": "voz-de-campo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Voz de Campo: registros de campo y compras por voz, con soporte offline.",
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/asegurar-config.mjs",
+    "dev": "vite",
+    "prebuild": "node scripts/asegurar-config.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/outfit": "^5.3.0",
+    "gsap": "^3.15.1",
+    "jsqr": "^1.4.0",
+    "lucide": "^1.72.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.2",
+    "@tailwindcss/vite": "^4.3.5",
+    "daisyui": "^5.7.50",
+    "tailwindcss": "^4.3.5",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}

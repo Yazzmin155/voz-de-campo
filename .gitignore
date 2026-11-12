@@ -134,3 +134,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Configuracion local con la clave de API (usar js/config.example.js como plantilla)
+js/config.js

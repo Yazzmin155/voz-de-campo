@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="es-MX" data-theme="esmeralda">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Voz de Campo: registra compras y ventas del campo con tu voz, incluso sin internet." />
+    <meta name="theme-color" content="#006459" />
+    <title>Voz de Campo</title>
+
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./assets/images/icon-192.png" />
+    <link rel="apple-touch-icon" href="./assets/images/icon-512.png" />
+
+    <script>
+      // Aplica el tema guardado antes de pintar la página para evitar parpadeos.
+      (function () {
+        var temas = ['esmeralda', 'tierra', 'agave', 'solar'];
+        try {
+          var guardado = localStorage.getItem('vdc_tema');
+          if (temas.indexOf(guardado) !== -1) document.documentElement.setAttribute('data-theme', guardado);
+        } catch (error) {
+          // Si el almacenamiento está bloqueado, se usa el tema por defecto.
+        }
+      })();
+    </script>
+  </head>
+
+  <body class="bg-base-100 font-sans text-base-content antialiased">
+    <!-- Splash: pantalla de carga con fondo #006459 -->
+    <section
+      id="pantalla-splash"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-between bg-neutral px-6 py-16 text-neutral-content"
+      aria-label="Cargando Voz de Campo"
+    >
+      <div class="flex flex-1 flex-col items-center justify-center gap-6">
+        <img
+          id="splash-logo"
+          src="./assets/images/icon-512.png"
+          alt="Logo de Voz de Campo"
+          class="h-40 w-40 opacity-0"
+        />
+        <h1 id="splash-titulo" class="text-2xl font-bold tracking-wide" aria-label="Voz de Campo">Voz de Campo</h1>
+      </div>
+      <progress
+        id="splash-progreso"
+        class="progress progress-primary w-56 bg-white/20"
+        value="0"
+        max="100"
+        aria-label="Progreso de carga"
+      ></progress>
+    </section>
+
+    <div id="app" class="relative mx-auto min-h-dvh w-full max-w-md">
+      <!-- Onboarding: carrusel de 3 pasos -->
+      <section id="pantalla-onboarding" class="pantalla min-h-dvh" hidden>
+        <div class="flex min-h-dvh flex-col">
+          <header class="flex items-center justify-between px-5 pt-6">
+            <span class="flex items-center gap-2">
+              <img src="./assets/images/icon-192.png" alt="" class="h-8 w-8 rounded-lg" aria-hidden="true" />
+              <span class="font-display text-sm font-semibold text-base-content">Voz de Campo</span>
+            </span>
+            <button id="btn-saltar" type="button" class="btn btn-ghost btn-sm" aria-label="Saltar introducción">
+              Saltar
+            </button>
+          </header>
+
+          <div id="carrusel-onboarding" class="carousel carousel-center w-full flex-1 snap-x">
+            <article class="carousel-item flex w-full flex-col items-center justify-center gap-6 px-8 text-center">
+              <div class="flex h-32 w-32 items-center justify-center rounded-full bg-base-200">
+                <i data-lucide="mic" class="h-14 w-14 text-base-content" aria-hidden="true"></i>
+              </div>
+              <h2 class="text-2xl font-bold">Habla, nosotros escribimos</h2>
+              <p class="text-base opacity-80">Dicta tus registros de campo o compras. La app convierte tu voz en texto.</p>
+            </article>
+            <article class="carousel-item flex w-full flex-col items-center justify-center gap-6 px-8 text-center">
+              <div class="flex h-32 w-32 items-center justify-center rounded-full bg-base-200">
+                <i data-lucide="wifi-off" class="h-14 w-14 text-base-content" aria-hidden="true"></i>
+              </div>
+              <h2 class="text-2xl font-bold">Funciona sin internet</h2>
+              <p class="text-base opacity-80">Tus registros se guardan en tu teléfono aunque no tengas señal.</p>
+            </article>
+            <article class="carousel-item flex w-full flex-col items-center justify-center gap-6 px-8 text-center">
+              <div class="flex h-32 w-32 items-center justify-center rounded-full bg-base-200">
+                <i data-lucide="volume-2" class="h-14 w-14 text-base-content" aria-hidden="true"></i>
+              </div>
+              <h2 class="text-2xl font-bold">Escucha tus registros</h2>
+              <p class="text-base opacity-80">Toca Escuchar en cualquier registro y la app lo leerá en voz alta.</p>
+            </article>
+          </div>
+
+          <div class="flex flex-col items-center gap-8 px-6 pb-10">
+            <div id="puntos-onboarding" class="flex items-center gap-2" aria-hidden="true">
+              <span class="h-2 w-6 rounded-full bg-primary transition-all"></span>
+              <span class="h-2 w-2 rounded-full bg-base-300 transition-all"></span>
+              <span class="h-2 w-2 rounded-full bg-base-300 transition-all"></span>
+            </div>
+            <button id="btn-siguiente" type="button" class="btn btn-primary btn-lg w-full">
+              <span id="texto-siguiente">Siguiente</span>
+              <i data-lucide="chevron-right" class="h-5 w-5" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Selección de rol -->
+      <section id="pantalla-rol" class="pantalla min-h-dvh" hidden>
+        <div class="flex min-h-dvh flex-col gap-8 px-5 py-10">
+          <header class="flex items-center gap-2">
+            <button
+              id="btn-rol-volver"
+              type="button"
+              class="btn btn-ghost btn-circle"
+              aria-label="Volver"
+              data-ir="dashboard"
+            >
+              <i data-lucide="arrow-left" class="h-5 w-5" aria-hidden="true"></i>
+            </button>
+          </header>
+
+          <div class="flex flex-col gap-2">
+            <h2 class="text-3xl font-extrabold leading-tight">¿Cómo usarás Voz de Campo?</h2>
+            <p class="text-base opacity-80">Elige tu perfil. No necesitas cuenta.</p>
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <button
+              type="button"
+              class="card card-border w-full bg-base-100 text-left shadow-sm"
+              data-rol="productor"
+              aria-label="Entrar como productor"
+            >
+              <span class="card-body flex-row items-center gap-4 p-5">
+                <span class="avatar-silueta avatar-productor h-14 w-14 shrink-0"></span>
+                <span class="flex-1">
+                  <span class="block text-lg font-bold">Soy Productor</span>
+                  <span class="block text-sm opacity-70">Registra tu cosecha, ventas y pendientes del campo.</span>
+                </span>
+                <i data-lucide="chevron-right" class="h-5 w-5 opacity-50" aria-hidden="true"></i>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              class="card card-border w-full bg-base-100 text-left shadow-sm"
+              data-rol="comprador"
+              aria-label="Entrar como comprador"
+            >
+              <span class="card-body flex-row items-center gap-4 p-5">
+                <span class="avatar-silueta avatar-comprador h-14 w-14 shrink-0"></span>
+                <span class="flex-1">
+                  <span class="block text-lg font-bold">Soy Comprador</span>
+                  <span class="block text-sm opacity-70">Registra tus compras y consulta tu historial.</span>
+                </span>
+                <i data-lucide="chevron-right" class="h-5 w-5 opacity-50" aria-hidden="true"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard: se adapta al rol (Productor / Comprador) -->
+      <section id="pantalla-dashboard" class="pantalla min-h-dvh" hidden>
+        <header class="sticky top-0 z-30 flex items-center justify-between gap-3 bg-base-100/95 px-5 py-4 backdrop-blur">
+          <div class="flex min-w-0 items-center gap-3">
+            <img src="./assets/images/icon-192.png" alt="" class="h-9 w-9 shrink-0 rounded-xl" aria-hidden="true" />
+            <span id="indicador-conexion" class="h-3 w-3 shrink-0 rounded-full bg-success" role="img" aria-label="En línea"></span>
+            <div class="min-w-0">
+              <p class="text-xs opacity-70">Voz de Campo</p>
+              <h2 id="saludo" class="truncate text-lg font-bold">Hola</h2>
+            </div>
+          </div>
+          <button type="button" class="btn btn-ghost btn-circle" aria-label="Ajustes" data-ir="ajustes">
+            <i data-lucide="settings" class="h-5 w-5" aria-hidden="true"></i>
+          </button>
+        </header>
+
+        <div class="flex flex-col gap-6 px-5 pb-28 pt-2">
+          <div class="stats w-full border border-base-300 bg-base-100 shadow-sm">
+            <div class="stat place-items-center">
+              <div class="stat-title">Registros</div>
+              <div id="stat-total" class="stat-value font-mono text-2xl">0</div>
+            </div>
+            <div class="stat place-items-center">
+              <div class="stat-title">Pendientes</div>
+              <div id="stat-pendientes" class="stat-value font-mono text-2xl text-warning">0</div>
+            </div>
+          </div>
+
+          <!-- Escudo legal: semáforo de avisos SENASICA y legales. Solo Productor. -->
+          <div id="tarjeta-escudo" class="card card-border bg-base-100 shadow-sm">
+            <div class="card-body flex-row items-center gap-4 p-5">
+              <span id="escudo-icono" class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-success text-success-content">
+                <i data-lucide="shield-check" class="h-6 w-6" aria-hidden="true"></i>
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wide opacity-70">Escudo legal</p>
+                <p id="escudo-titulo" class="font-display text-lg font-bold">Todo en orden</p>
+                <p id="escudo-detalle" class="text-sm opacity-80">Sin avisos en los últimos 30 días.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accesos rápidos: copiloto y pasaporte de lote -->
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" class="card card-border bg-base-100 text-left shadow-sm" data-ir="chat" aria-label="Preguntar a tu campo">
+              <span class="card-body items-start gap-2 p-4">
+                <i data-lucide="message-circle" class="h-6 w-6 text-base-content" aria-hidden="true"></i>
+                <span class="font-display font-bold">Pregunta a tu campo</span>
+              </span>
+            </button>
+            <button type="button" class="card card-border bg-base-100 text-left shadow-sm" data-ir="pasaporte" aria-label="Pasaporte de lote">
+              <span class="card-body items-start gap-2 p-4">
+                <i data-lucide="qr-code" class="h-6 w-6 text-base-content" aria-hidden="true"></i>
+                <span id="acceso-pasaporte-texto" class="font-display font-bold">Pasaporte QR</span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Plan Pro: solo visible en modo Comprador -->
+          <div id="bloque-plan-pro" class="card bg-primary text-primary-content" hidden>
+            <div class="card-body flex-row items-center gap-4 p-5">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-base-100/60">
+                <i data-lucide="crown" class="h-6 w-6" aria-hidden="true"></i>
+              </div>
+              <div class="flex-1">
+                <p class="font-bold">Plan Pro</p>
+                <p class="text-sm opacity-80">Reportes y alertas para tus compras.</p>
+              </div>
+              <button type="button" class="btn btn-sm border-0 bg-base-100 text-base-content" data-modal="modal-plan-pro">
+                Ver
+              </button>
+            </div>
+          </div>
+
+          <!-- Entrada de voz y texto -->
+          <div class="card card-border bg-base-100 shadow-sm">
+            <div class="card-body gap-4 p-5">
+              <label for="entrada-texto" class="text-base font-semibold">Nuevo registro</label>
+              <select id="entrada-parcela" class="select select-sm w-full" aria-label="Parcela del registro">
+                <option value="">Sin parcela</option>
+              </select>
+              <div class="relative">
+                <textarea
+                  id="entrada-texto"
+                  class="textarea textarea-lg min-h-44 w-full pr-16 text-base"
+                  placeholder="Toca el micrófono o escribe tu registro..."
+                ></textarea>
+                <button
+                  id="btn-microfono"
+                  type="button"
+                  class="btn btn-circle btn-primary absolute bottom-3 right-3 shadow-md"
+                  aria-label="Dictar por voz"
+                  aria-pressed="false"
+                >
+                  <i data-lucide="mic" class="h-5 w-5" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div id="radar-voz" class="radar" aria-hidden="true" hidden></div>
+              <p id="estado-dictado" class="text-sm opacity-70" aria-live="polite" hidden>Escuchando...</p>
+              <button id="btn-guardar" type="button" class="btn btn-primary btn-lg w-full">
+                <i data-lucide="save" class="h-5 w-5" aria-hidden="true"></i>
+                Guardar Registro
+              </button>
+            </div>
+          </div>
+
+          <section class="flex flex-col gap-3" aria-labelledby="titulo-recientes">
+            <div class="flex items-center justify-between">
+              <h3 id="titulo-recientes" class="text-lg font-bold">Últimos registros</h3>
+              <button type="button" class="btn btn-ghost btn-sm" data-ir="historial">Ver todo</button>
+            </div>
+            <div id="lista-recientes" class="flex flex-col gap-3"></div>
+          </section>
+        </div>
+      </section>
+
+      <!-- Historial -->
+      <section id="pantalla-historial" class="pantalla min-h-dvh" hidden>
+        <div class="flex flex-col gap-5 px-5 pb-28 pt-6">
+          <header class="flex flex-col gap-1">
+            <h2 id="titulo-historial" class="text-2xl font-bold">Historial</h2>
+            <p class="text-sm opacity-70">Tus registros guardados en este teléfono.</p>
+          </header>
+          <div id="lista-historial" class="flex flex-col gap-3"></div>
+          <div id="vacio-historial" hidden></div>
+        </div>
+      </section>
+
+      <!-- Mi Campo (solo Productor) -->
+      <section id="pantalla-micampo" class="pantalla min-h-dvh" hidden>
+        <div class="flex flex-col gap-5 px-5 pb-28 pt-6">
+          <header>
+            <h2 class="text-2xl font-bold">Mi Campo</h2>
+          </header>
+
+          <div class="card card-border bg-base-100 shadow-sm">
+            <div class="card-body flex-row items-center gap-4 p-5">
+              <span class="avatar-silueta avatar-productor h-14 w-14 shrink-0" aria-hidden="true"></span>
+              <div class="min-w-0">
+                <p id="campo-rol" class="font-bold">Productor</p>
+                <p id="campo-resumen" class="text-sm opacity-70">0 registros</p>
+              </div>
+            </div>
+          </div>
+
+          <section class="flex flex-col gap-3" aria-labelledby="titulo-parcelas">
+            <div class="flex items-center justify-between">
+              <h3 id="titulo-parcelas" class="text-lg font-bold">Parcelas</h3>
+              <button type="button" class="btn btn-primary btn-sm" data-modal="modal-parcela">
+                <i data-lucide="plus" class="h-4 w-4" aria-hidden="true"></i>
+                Nueva
+              </button>
+            </div>
+            <div id="lista-parcelas" class="flex flex-col gap-3"></div>
+          </section>
+
+          <section class="flex flex-col gap-3" aria-labelledby="titulo-inventario">
+            <h3 id="titulo-inventario" class="text-lg font-bold">Inventario</h3>
+            <div id="lista-inventario" class="flex flex-col gap-3"></div>
+          </section>
+
+          <section class="flex flex-col gap-3" aria-labelledby="titulo-cosechas">
+            <div>
+              <h3 id="titulo-cosechas" class="text-lg font-bold">Próximas cosechas</h3>
+              <p class="text-xs opacity-70">Estimación de la IA según la base de conocimiento.</p>
+            </div>
+            <div id="lista-cosechas" class="flex flex-col gap-3"></div>
+          </section>
+
+          <ul class="menu w-full rounded-box border border-base-300 bg-base-100 p-2">
+            <li>
+              <button type="button" data-ir="historial">
+                <i data-lucide="history" class="h-5 w-5" aria-hidden="true"></i>
+                Ver historial
+              </button>
+            </li>
+            <li>
+              <button type="button" data-ir="pasaporte">
+                <i data-lucide="qr-code" class="h-5 w-5" aria-hidden="true"></i>
+                Pasaporte QR
+              </button>
+            </li>
+            <li>
+              <button type="button" id="btn-cambiar-rol-campo">
+                <i data-lucide="arrow-left-right" class="h-5 w-5" aria-hidden="true"></i>
+                Cambiar de rol
+              </button>
+            </li>
+            <li>
+              <button type="button" id="btn-borrar-campo" class="text-error">
+                <i data-lucide="trash-2" class="h-5 w-5" aria-hidden="true"></i>
+                Borrar todos los datos
+              </button>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Chat copiloto -->
+      <section id="pantalla-chat" class="pantalla min-h-dvh" hidden>
+        <div class="flex min-h-dvh flex-col">
+          <header class="vidrio sticky top-0 z-30 flex items-center gap-2 border-b border-base-300 px-4 py-3">
+            <button type="button" class="btn btn-ghost btn-circle" aria-label="Volver" data-ir="dashboard">
+              <i data-lucide="arrow-left" class="h-5 w-5" aria-hidden="true"></i>
+            </button>
+            <div class="min-w-0">
+              <h2 class="text-lg font-bold">Copiloto de campo</h2>
+              <p class="text-xs opacity-70">Pregunta sobre tus registros</p>
+            </div>
+          </header>
+          <div id="chat-mensajes" class="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4" aria-live="polite"></div>
+          <div id="chat-sugerencias" class="flex gap-2 overflow-x-auto px-4 pb-3"></div>
+          <form id="chat-formulario" class="flex items-center gap-2 border-t border-base-300 bg-base-100 px-4 py-3">
+            <input
+              id="chat-entrada"
+              type="text"
+              class="input flex-1"
+              maxlength="300"
+              autocomplete="off"
+              placeholder="Pregunta sobre tu campo"
+              aria-label="Escribe tu pregunta"
+            />
+            <button type="submit" class="btn btn-primary btn-circle" aria-label="Enviar pregunta">
+              <i data-lucide="send" class="h-5 w-5" aria-hidden="true"></i>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Pasaporte QR: emitir (productor) y verificar (ambos) -->
+      <section id="pantalla-pasaporte" class="pantalla min-h-dvh" hidden>
+        <div class="flex flex-col gap-5 px-5 pb-10 pt-4">
+          <header class="flex items-center gap-2">
+            <button type="button" class="btn btn-ghost btn-circle" aria-label="Volver" data-ir="dashboard">
+              <i data-lucide="arrow-left" class="h-5 w-5" aria-hidden="true"></i>
+            </button>
+            <h2 class="text-2xl font-bold">Pasaporte QR</h2>
+          </header>
+
+          <div id="pasaporte-emitir" class="card card-border bg-base-100 shadow-sm">
+            <div class="card-body gap-4 p-5">
+              <h3 class="text-lg font-bold">Emitir pasaporte</h3>
+              <p class="text-sm opacity-80">Genera un código con el historial de tu parcela. Cualquiera puede verificar que no fue alterado.</p>
+              <select id="pasaporte-parcela" class="select w-full" aria-label="Parcela a emitir"></select>
+              <button id="btn-emitir-pasaporte" type="button" class="btn btn-primary w-full">
+                <i data-lucide="qr-code" class="h-5 w-5" aria-hidden="true"></i>
+                Generar pasaporte
+              </button>
+              <div id="pasaporte-salida" class="flex flex-col items-center gap-3" hidden>
+                <img id="pasaporte-qr" alt="Código QR del pasaporte" class="h-60 w-60 rounded-box bg-white p-2" hidden />
+                <textarea id="pasaporte-codigo" class="textarea w-full font-mono text-xs" rows="4" readonly aria-label="Código del pasaporte"></textarea>
+                <button id="btn-copiar-pasaporte" type="button" class="btn btn-ghost btn-sm">
+                  <i data-lucide="copy" class="h-4 w-4" aria-hidden="true"></i>
+                  Copiar código
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card-border bg-base-100 shadow-sm">
+            <div class="card-body gap-4 p-5">
+              <h3 class="text-lg font-bold">Verificar lote</h3>
+              <p class="text-sm opacity-80">Escanea el QR del pasaporte o pega su código.</p>
+              <video id="pasaporte-video" class="w-full rounded-box bg-black" playsinline muted hidden aria-label="Vista de la cámara"></video>
+              <div class="grid grid-cols-2 gap-2">
+                <button id="btn-escanear" type="button" class="btn btn-primary">
+                  <i data-lucide="scan-line" class="h-5 w-5" aria-hidden="true"></i>
+                  Escanear
+                </button>
+                <button id="btn-detener-escaner" type="button" class="btn btn-ghost" hidden>Detener</button>
+              </div>
+              <textarea id="pasaporte-pegado" class="textarea w-full font-mono text-xs" rows="3" placeholder="O pega aquí el código del pasaporte" aria-label="Código del pasaporte para verificar"></textarea>
+              <button id="btn-verificar" type="button" class="btn btn-outline w-full">Verificar código</button>
+            </div>
+          </div>
+
+          <div id="pasaporte-resultado" class="card card-border bg-base-100 shadow-sm" hidden>
+            <div class="card-body gap-2 p-5">
+              <div class="flex items-center justify-between gap-2">
+                <p id="res-nombre" class="font-display text-lg font-bold"></p>
+                <span id="res-integridad" class="badge badge-lg"></span>
+              </div>
+              <p id="res-detalle" class="text-sm opacity-80"></p>
+              <p id="res-practicas" class="font-mono text-xs opacity-80"></p>
+              <p class="text-xs opacity-70">Emitido el <span id="res-emitido" class="font-mono"></span></p>
+              <p id="res-nota" class="text-xs opacity-70"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ajustes -->
+      <section id="pantalla-ajustes" class="pantalla min-h-dvh" hidden>
+        <div class="flex flex-col gap-5 px-5 pb-10 pt-4">
+          <header class="flex items-center gap-2">
+            <button type="button" class="btn btn-ghost btn-circle" aria-label="Volver" data-ir="dashboard">
+              <i data-lucide="arrow-left" class="h-5 w-5" aria-hidden="true"></i>
+            </button>
+            <h2 class="text-2xl font-bold">Ajustes</h2>
+          </header>
+
+          <section class="flex flex-col gap-3" aria-labelledby="titulo-apariencia">
+            <h3 id="titulo-apariencia" class="text-lg font-bold">Apariencia</h3>
+            <div id="selector-temas" class="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Tema visual"></div>
+          </section>
+
+          <ul class="menu w-full rounded-box border border-base-300 bg-base-100 p-2">
+            <li>
+              <button type="button" id="btn-ajuste-rol">
+                <i data-lucide="arrow-left-right" class="h-5 w-5" aria-hidden="true"></i>
+                Cambiar de rol
+              </button>
+            </li>
+            <li>
+              <label class="flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2">
+                <span class="flex items-center gap-3">
+                  <i data-lucide="volume-2" class="h-5 w-5" aria-hidden="true"></i>
+                  Sonidos de interfaz
+                </span>
+                <input id="toggle-sonido" type="checkbox" class="toggle toggle-primary" />
+              </label>
+            </li>
+            <li>
+              <button type="button" id="btn-probar-microfono">
+                <i data-lucide="mic" class="h-5 w-5" aria-hidden="true"></i>
+                Probar micrófono
+                <span id="estado-microfono" class="ml-auto max-w-[55%] truncate text-xs opacity-70" aria-live="polite"></span>
+              </button>
+            </li>
+            <li>
+              <button type="button" data-modal="modal-privacidad">
+                <i data-lucide="shield-check" class="h-5 w-5" aria-hidden="true"></i>
+                Privacidad
+              </button>
+            </li>
+            <li>
+              <button type="button" data-modal="modal-soporte">
+                <i data-lucide="life-buoy" class="h-5 w-5" aria-hidden="true"></i>
+                Soporte
+              </button>
+            </li>
+          </ul>
+
+          <div id="version-app" class="flex select-none items-center justify-between rounded-box border border-base-300 bg-base-100 px-4 py-3 text-sm">
+            <span class="flex items-center gap-3">
+              <i data-lucide="info" class="h-5 w-5" aria-hidden="true"></i>
+              Versión
+            </span>
+            <span class="font-semibold">1.0.0</span>
+          </div>
+
+          <section id="god-mode" class="flex flex-col gap-3 rounded-box border-2 border-dashed border-warning bg-base-100 p-4" aria-labelledby="titulo-god" hidden>
+            <div class="flex items-center gap-2">
+              <i data-lucide="flask-conical" class="h-5 w-5 text-warning" aria-hidden="true"></i>
+              <h3 id="titulo-god" class="text-lg font-bold">Modo God</h3>
+            </div>
+            <p class="text-xs opacity-70">Herramientas para demostraciones. Solo afectan los datos de este dispositivo.</p>
+            <button id="god-sembrar" type="button" class="btn btn-outline btn-sm">Sembrar datos de prueba</button>
+            <button id="god-forzar-alerta" type="button" class="btn btn-outline btn-sm">Forzar alerta crítica</button>
+            <label class="flex cursor-pointer items-center justify-between gap-3">
+              <span class="text-sm font-semibold">Simular zona sin señal</span>
+              <input id="god-sin-red" type="checkbox" class="toggle toggle-warning" />
+            </label>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <!-- Navegación inferior: los ítems se generan según el rol -->
+    <nav
+      id="bottom-nav"
+      class="dock dock-sm vidrio fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md border-t border-base-300"
+      aria-label="Navegación principal"
+      hidden
+    ></nav>
+
+    <!-- Banner de zona sin señal -->
+    <div id="banner-red" class="fixed inset-x-0 top-0 z-40 mx-auto max-w-md px-5 pt-3" hidden>
+      <div class="flex items-center gap-3 rounded-box border border-base-300 bg-base-100 px-4 py-3 shadow-md" role="status">
+        <i data-lucide="wifi-off" class="h-5 w-5 shrink-0 text-warning" aria-hidden="true"></i>
+        <span class="text-sm font-medium">Sin señal. Tus registros se guardan y se analizan al volver la red.</span>
+      </div>
+    </div>
+
+    <!-- Banner de nueva versión -->
+    <div id="banner-actualizacion" class="fixed inset-x-0 bottom-24 z-40 mx-auto max-w-md px-5" hidden>
+      <div class="flex items-center justify-between gap-3 rounded-box bg-primary px-4 py-3 text-primary-content shadow-md" role="status">
+        <span class="text-sm font-semibold">Hay una versión nueva de Voz de Campo.</span>
+        <button id="btn-actualizar" type="button" class="btn btn-sm border-0 bg-base-100 text-base-content">Actualizar</button>
+      </div>
+    </div>
+
+    <!-- Banner de sincronización con la IA -->
+    <div id="banner-sync" class="fixed inset-x-0 top-3 z-40 mx-auto max-w-md px-5" hidden>
+      <div class="flex items-center gap-3 rounded-box border border-base-300 bg-base-100 px-4 py-3 shadow-md" role="status">
+        <span class="loading loading-spinner loading-sm text-primary" aria-hidden="true"></span>
+        <span id="texto-sync" class="text-sm font-medium">Analizando con IA...</span>
+      </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div id="toasts" class="toast toast-top toast-center z-[60] w-[90%] max-w-sm" aria-live="polite"></div>
+
+    <!-- Modales -->
+    <dialog id="modal-privacidad" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box">
+        <h3 class="text-lg font-bold">Privacidad</h3>
+        <p class="py-4 text-sm leading-relaxed">
+          Por ahora tus registros se guardan únicamente en este teléfono. No pedimos cuenta ni datos personales.
+          Puedes borrar todo en cualquier momento desde Mi Campo.
+        </p>
+        <div class="modal-action">
+          <form method="dialog">
+            <button class="btn btn-primary">Entendido</button>
+          </form>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button aria-label="Cerrar">Cerrar</button>
+      </form>
+    </dialog>
+
+    <dialog id="modal-soporte" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box">
+        <h3 class="text-lg font-bold">Soporte</h3>
+        <p class="py-4 text-sm leading-relaxed">
+          Si el micrófono no funciona, revisa que tu navegador tenga permiso para usarlo.
+          El dictado funciona mejor en Chrome o Edge. Si el problema continúa, intenta recargar la app.
+        </p>
+        <div class="modal-action">
+          <form method="dialog">
+            <button class="btn btn-primary">Entendido</button>
+          </form>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button aria-label="Cerrar">Cerrar</button>
+      </form>
+    </dialog>
+
+    <dialog id="modal-plan-pro" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box">
+        <div class="mb-2 flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary">
+            <i data-lucide="crown" class="h-6 w-6 text-primary-content" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-lg font-bold">Plan Pro</h3>
+        </div>
+        <p class="py-2 text-sm leading-relaxed">Próximamente, con Plan Pro tendrás:</p>
+        <ul class="flex flex-col gap-2 pb-2 text-sm">
+          <li class="flex items-center gap-2">
+            <i data-lucide="check" class="h-4 w-4 text-success" aria-hidden="true"></i>
+            Reportes mensuales de tus compras
+          </li>
+          <li class="flex items-center gap-2">
+            <i data-lucide="check" class="h-4 w-4 text-success" aria-hidden="true"></i>
+            Alertas de precios en tu zona
+          </li>
+          <li class="flex items-center gap-2">
+            <i data-lucide="check" class="h-4 w-4 text-success" aria-hidden="true"></i>
+            Respaldo de tus registros
+          </li>
+        </ul>
+        <div class="modal-action">
+          <form method="dialog">
+            <button class="btn btn-primary">Entendido</button>
+          </form>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button aria-label="Cerrar">Cerrar</button>
+      </form>
+    </dialog>
+
+    <dialog id="modal-parcela" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box">
+        <h3 class="text-lg font-bold">Nueva parcela</h3>
+        <form id="form-parcela" class="flex flex-col gap-4 pt-4">
+          <label class="flex flex-col gap-1">
+            <span class="text-sm font-semibold">Nombre</span>
+            <input id="parcela-nombre" type="text" class="input w-full" maxlength="40" required placeholder="Ej. Naranjal Norte" />
+          </label>
+          <label class="flex flex-col gap-1">
+            <span class="text-sm font-semibold">Cultivo</span>
+            <select id="parcela-cultivo" class="select w-full">
+              <option value="naranja">Naranja</option>
+              <option value="maiz">Maíz</option>
+              <option value="agave">Agave</option>
+              <option value="limon">Limón</option>
+              <option value="jitomate">Jitomate</option>
+              <option value="cebolla">Cebolla</option>
+              <option value="otro">Otro</option>
+            </select>
+          </label>
+          <label class="flex flex-col gap-1">
+            <span class="text-sm font-semibold">Superficie (hectáreas)</span>
+            <input id="parcela-superficie" type="number" class="input w-full font-mono" min="0.1" step="0.1" required />
+          </label>
+          <div class="modal-action">
+            <button type="button" class="btn btn-ghost" data-cerrar>Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar parcela</button>
+          </div>
+        </form>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button aria-label="Cerrar">Cerrar</button>
+      </form>
+    </dialog>
+
+    <dialog id="modal-borrar" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box">
+        <h3 class="text-lg font-bold">¿Borrar todos los datos?</h3>
+        <p class="py-4 text-sm leading-relaxed">
+          Se eliminarán todos tus registros y tu rol de este teléfono. Esta acción no se puede deshacer.
+        </p>
+        <div class="modal-action">
+          <form method="dialog" class="flex w-full gap-2">
+            <button class="btn btn-ghost flex-1">Cancelar</button>
+            <button id="btn-confirmar-borrar" type="button" class="btn btn-error flex-1">Borrar todo</button>
+          </form>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button aria-label="Cerrar">Cerrar</button>
+      </form>
+    </dialog>
+
+    <!-- Plantillas reutilizables -->
+    <template id="plantilla-registro">
+      <article class="card card-border tarjeta-registro bg-base-100 shadow-sm">
+        <div class="card-body gap-3 p-4">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex min-w-0 items-center gap-2">
+              <img class="imagen-cultivo h-8 w-8 shrink-0 rounded-lg object-cover" alt="" aria-hidden="true" hidden />
+              <span class="etiqueta-categoria badge badge-sm border-0"></span>
+              <time class="truncate font-mono text-xs opacity-70"></time>
+            </div>
+            <span class="indicador-sync flex shrink-0 items-center"></span>
+          </div>
+          <p class="texto text-sm leading-relaxed"></p>
+          <div class="bloque-recomendacion hidden rounded-r-box p-3 text-sm">
+            <p class="mb-1 text-xs font-bold uppercase opacity-70">Recomendación</p>
+            <p class="texto-recomendacion leading-relaxed"></p>
+          </div>
+          <div class="bloque-alerta hidden rounded-r-box p-3 text-sm">
+            <p class="mb-1 flex items-center gap-1 text-xs font-bold uppercase">
+              <i data-lucide="triangle-alert" class="h-3.5 w-3.5" aria-hidden="true"></i>
+              Aviso legal
+            </p>
+            <p class="texto-alerta leading-relaxed"></p>
+          </div>
+          <div class="card-actions justify-end">
+            <button type="button" class="btn btn-circle btn-ghost btn-sm btn-leer" aria-label="Escuchar registro">
+              <i data-lucide="play" class="h-4 w-4" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

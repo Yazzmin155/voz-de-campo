@@ -1,0 +1,318 @@
+/* Sistema visual de Voz de Campo: Tailwind CSS + DaisyUI con cuatro temas y tres familias tipográficas. */
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: false;
+}
+
+/* Tema por defecto: paleta oficial de la skill ui-design. */
+@plugin "daisyui/theme" {
+  name: "esmeralda";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #f8f5e3;
+  --color-base-300: #ebe6cc;
+  --color-base-content: #006459;
+  --color-primary: #f6c223;
+  --color-primary-content: #006459;
+  --color-secondary: #ed8131;
+  --color-secondary-content: #006459;
+  --color-accent: #07a67d;
+  --color-accent-content: #ffffff;
+  --color-neutral: #006459;
+  --color-neutral-content: #ffffff;
+  --color-info: #006459;
+  --color-info-content: #ffffff;
+  --color-success: #07a67d;
+  --color-success-content: #ffffff;
+  --color-warning: #ed8131;
+  --color-warning-content: #006459;
+  --color-error: #ed8131;
+  --color-error-content: #006459;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/* Tierra y Cosecha: arena cálida y terracota, para el productor tradicional. */
+@plugin "daisyui/theme" {
+  name: "tierra";
+  default: false;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: #fbf6ee;
+  --color-base-200: #f3e9d8;
+  --color-base-300: #e4d4bb;
+  --color-base-content: #4a2e17;
+  --color-primary: #b5651d;
+  --color-primary-content: #ffffff;
+  --color-secondary: #c9a227;
+  --color-secondary-content: #3b2612;
+  --color-accent: #6b8e23;
+  --color-accent-content: #ffffff;
+  --color-neutral: #4a2e17;
+  --color-neutral-content: #fbf6ee;
+  --color-info: #4a6b7a;
+  --color-info-content: #ffffff;
+  --color-success: #6b8e23;
+  --color-success-content: #ffffff;
+  --color-warning: #c9a227;
+  --color-warning-content: #3b2612;
+  --color-error: #b5651d;
+  --color-error-content: #ffffff;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/* Agave y Niebla: gris verdoso y salvia, sobrio para uso diario. */
+@plugin "daisyui/theme" {
+  name: "agave";
+  default: false;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: #eef2ef;
+  --color-base-200: #e1e8e4;
+  --color-base-300: #cbd7d0;
+  --color-base-content: #1f3a33;
+  --color-primary: #4f7f6f;
+  --color-primary-content: #ffffff;
+  --color-secondary: #8aa39a;
+  --color-secondary-content: #1f3a33;
+  --color-accent: #2f6f5e;
+  --color-accent-content: #ffffff;
+  --color-neutral: #1f3a33;
+  --color-neutral-content: #eef2ef;
+  --color-info: #4f7f9f;
+  --color-info-content: #ffffff;
+  --color-success: #3f8f6e;
+  --color-success-content: #ffffff;
+  --color-warning: #b7862a;
+  --color-warning-content: #ffffff;
+  --color-error: #b5543a;
+  --color-error-content: #ffffff;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/* Alto Contraste Solar: negro y amarillo, para leer con sol directo. Bordes más gruesos. */
+@plugin "daisyui/theme" {
+  name: "solar";
+  default: false;
+  prefersdark: true;
+  color-scheme: dark;
+  --color-base-100: #000000;
+  --color-base-200: #111111;
+  --color-base-300: #4a4a4a;
+  --color-base-content: #ffffff;
+  --color-primary: #ffd400;
+  --color-primary-content: #000000;
+  --color-secondary: #ffffff;
+  --color-secondary-content: #000000;
+  --color-accent: #00e0a0;
+  --color-accent-content: #000000;
+  --color-neutral: #ffffff;
+  --color-neutral-content: #000000;
+  --color-info: #7fdcff;
+  --color-info-content: #000000;
+  --color-success: #00e0a0;
+  --color-success-content: #000000;
+  --color-warning: #ffd400;
+  --color-warning-content: #000000;
+  --color-error: #ff6b3d;
+  --color-error-content: #000000;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.3rem;
+  --size-field: 0.3rem;
+  --border: 2px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/* Tres familias: Outfit para títulos, DM Sans para lectura y JetBrains Mono para datos. */
+@theme {
+  --font-display: "Outfit Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+}
+
+/* Overrides generales */
+[hidden] {
+  display: none !important;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overscroll-behavior-y: none;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+}
+
+/* Clases para las animaciones GSAP del splash y el carrusel */
+.letra {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.carousel {
+  scrollbar-width: none;
+}
+
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Respeta el área segura de iPhone y Android con gesto inferior */
+.dock {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Vidrio: solo en pocas superficies (barra inferior y banners) para no castigar gamas bajas. */
+.vidrio {
+  background-color: color-mix(in oklab, var(--color-base-100) 82%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* Colores de categoría de los registros. */
+.categoria-cultivo {
+  background-color: #07a67d;
+  color: #ffffff;
+}
+
+.categoria-inventario {
+  background-color: #2f7fbf;
+  color: #ffffff;
+}
+
+.categoria-actividad {
+  background-color: #006459;
+  color: #ffffff;
+}
+
+.categoria-venta {
+  background-color: #f6c223;
+  color: #006459;
+}
+
+.categoria-alerta {
+  background-color: #ed8131;
+  color: #006459;
+}
+
+/* Bloques de la IA: recomendación con borde verde y aviso legal con borde naranja */
+.bloque-recomendacion {
+  border-left: 4px solid #07a67d;
+  background-color: rgb(7 166 125 / 0.1);
+}
+
+.bloque-alerta {
+  border-left: 4px solid #ed8131;
+  background-color: rgb(237 129 49 / 0.15);
+}
+
+/* Tarjeta de certificación con reflejo holográfico. El brillo lo mueve GSAP. */
+.holografico {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.holografico .brillo {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 45%;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgb(255 255 255 / 0.05) 30%,
+    rgb(255 255 255 / 0.55) 50%,
+    rgb(255 255 255 / 0.05) 70%,
+    transparent 100%
+  );
+  transform: translateX(-120%);
+  z-index: 1;
+}
+
+/* Radar de voz: barras del ecualizador simulado. Las alturas las anima GSAP. */
+.radar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 56px;
+}
+
+.radar span {
+  width: 5px;
+  height: 8px;
+  border-radius: 999px;
+  background-color: var(--color-primary);
+  transform-origin: center;
+}
+
+/* Avatares de silueta: la figura se pinta con el color de texto del tema dentro de un círculo de acento.
+   Así el contraste se mantiene en los cuatro temas, incluido el oscuro de Alto Contraste Solar. */
+.avatar-silueta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: var(--color-primary);
+  color: var(--color-primary-content);
+}
+
+.avatar-silueta::before {
+  content: "";
+  width: 62%;
+  height: 62%;
+  background-color: currentColor;
+  -webkit-mask: var(--avatar) center / contain no-repeat;
+  mask: var(--avatar) center / contain no-repeat;
+}
+
+.avatar-productor {
+  --avatar: url("/assets/images/avatar-productor.webp");
+}
+
+.avatar-comprador {
+  --avatar: url("/assets/images/avatar-comprador.webp");
+}
+
+/* Accesibilidad: reduce animaciones CSS si el usuario lo pide */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "nota": "Base de conocimiento del motor local. Las palabras se comparan sin acentos y en minúsculas. No incluir datos no verificados: los períodos de carencia de agroquímicos dependen de cada producto y se indican como 'consultar etiqueta'.",
+  "cultivos": {
+    "naranja": {
+      "nombre": "Naranja",
+      "palabras": ["naranja", "naranjas", "naranjal"],
+      "cosechaAnios": { "min": 3, "max": 5 },
+      "anaquel": "3 a 6 semanas en frío"
+    },
+    "maiz": {
+      "nombre": "Maíz",
+      "palabras": ["maiz", "maices", "elote", "elotes", "milpa"],
+      "cosechaDias": { "min": 90, "max": 150 },
+      "anaquel": "elote de 3 a 5 días a temperatura ambiente"
+    },
+    "limon": {
+      "nombre": "Limón",
+      "palabras": ["limon", "limones", "limonero", "limoneros"],
+      "cosechaAnios": { "min": 2, "max": 3 },
+      "anaquel": "3 a 6 semanas en frío"
+    },
+    "jitomate": {
+      "nombre": "Jitomate",
+      "palabras": ["jitomate", "jitomates", "tomate", "tomates"],
+      "cosechaDias": { "min": 60, "max": 90 },
+      "anaquel": "1 a 3 semanas"
+    },
+    "cebolla": {
+      "nombre": "Cebolla",
+      "palabras": ["cebolla", "cebollas"],
+      "cosechaDias": { "min": 90, "max": 150 },
+      "anaquel": "curada de 3 a 6 meses"
+    }
+  },
+  "intenciones": {
+    "venta": {
+      "categoria": "venta",
+      "palabras": ["vendi", "vender", "venta", "vendo", "contrato", "precio", "cobre", "cobro", "pague", "pago"]
+    },
+    "siembra": {
+      "categoria": "cultivo",
+      "palabras": ["sembre", "siembra", "sembrar", "plante", "planto", "plantacion"],
+      "esSiembra": true
+    },
+    "cosecha": {
+      "categoria": "cultivo",
+      "palabras": ["cosech", "cosecha", "corte"]
+    },
+    "inventario": {
+      "categoria": "inventario",
+      "palabras": ["tengo", "hay", "almacen", "bodega", "bultos", "costales", "existencia", "inventario"]
+    },
+    "aplicacion": {
+      "categoria": "actividad",
+      "palabras": ["fumigue", "fumigar", "aplique", "aplicar", "riegue", "regue", "poda", "desyerbe"]
+    }
+  },
+  "disparadores": [
+    {
+      "id": "agroquimico",
+      "palabras": ["fertiliz", "fertilic", "agroquimic", "insecticid", "fungicid", "herbicid", "plaguicid", "glifosato", "urea"],
+      "alerta": "Guarda el ticket de compra y consulta a SENASICA sobre el uso de este producto. Revisa el período de carencia en la etiqueta antes de cosechar."
+    },
+    {
+      "id": "riego",
+      "palabras": ["agua", "riego", "regue", "regar", "pozo", "bomba", "canal de riego"],
+      "alerta": "Si usas agua de pozo o de canal, verifica que tengas la concesión vigente ante CONAGUA."
+    },
+    {
+      "id": "venta",
+      "palabras": ["venta", "vendi", "vender", "contrato", "cobre", "cobro"],
+      "alerta": "Documenta la venta por escrito: fecha, comprador, cantidad y precio acordado."
+    },
+    {
+      "id": "plagas",
+      "palabras": ["plaga", "plagas", "gusano", "pulgon", "chapulin", "roya", "mosca blanca"],
+      "alerta": "Reporta la plaga a las autoridades agrícolas de tu localidad, como SENASICA, para que den seguimiento."
+    }
+  ],
+  "unidades": {
+    "kilo": ["kilo", "kilos", "kg", "kgs"],
+    "tonelada": ["tonelada", "toneladas", "ton"],
+    "bulto": ["bulto", "bultos"],
+    "costal": ["costal", "costales"],
+    "hectarea": ["hectarea", "hectareas", "ha"],
+    "litro": ["litro", "litros", "lt"],
+    "planta": ["planta", "plantas", "arbol", "arboles"]
+  }
+}
